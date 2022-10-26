@@ -19,3 +19,15 @@ The only thing I want to inherit from my original project is the tool I used to 
   - Before, I had used Azure to host the project. Now, I see the benefit of using Firebase for user authentication support and firestore.
   
 - Security Improvements (SQL Injections)
+
+
+<h2> What I want to do </h2>
+
+I want to completely overhaul my previous project from the ground up. 
+ 
+ - Use ReactJS instead of Flask
+ - Query API's instead of CSV file
+ - Overhaul the UI to support more information about the show
+ - User logging in/personal profiles
+
+The ONLY thing I would do similarly is maybe the color scheme and the library I used for the graphs, [CanvasJS](https://canvasjs.com/) 
