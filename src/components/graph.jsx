@@ -13,6 +13,7 @@ function Graph({setShow,showInput}) {
     const [isLoading, setLoading] = useState(true);
     let [dataset, setDataSet] = useState([])
 
+
     function addToDataset(dataSet) {
         setDataSet(dataset => [...dataset, dataSet])
     }
@@ -64,7 +65,11 @@ function Graph({setShow,showInput}) {
 
     var chart = new CanvasJSChart("chartContainer", options);
 
-    async function getShowInfo  (showInput) {
+    async function getShowInfo(showInput) {
+        if (!showInput){
+            return
+        }
+        console.log(showInput)
         await axios("https://api.themoviedb.org/3/search/tv?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US&page=1&query="+showInput+"&include_adult=false")
         .then((res) =>{
             const json = res.data;
@@ -72,26 +77,37 @@ function Graph({setShow,showInput}) {
             setShowName(json.results[0]['name']);
             setPosterPath("https://image.tmdb.org/t/p/w500"+json.results[0]['poster_path'])
             setShowID(json.results[0]['id']);
-
+            return axios("https://api.themoviedb.org/3/tv/"+showID+"?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US")
+            .then((res) =>{
+                console.log("Fetching Season data")
+                const json = res.data
+                setSeasonCount(json['number_of_seasons'])
+            })
+            .catch(()=>{
+                console.log("Could not fetch season data")
+                return
+                })
         })
+        .catch(()=>{
+            console.log("Could not fetch show data")
+            return
+        })
+
         if (!showID){
             return
         }
-        await axios("https://api.themoviedb.org/3/tv/"+showID+"?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US")
-        .then((res) =>{
-            const json = res.data
-            setSeasonCount(json['number_of_seasons'])
-        })
         let epCounter = 1;
         for(let i = 1; i <= totalSeasons; ++i){
             await axios("https://api.themoviedb.org/3/tv/"+showID+"/season/"+String(i)+"?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US")
             // eslint-disable-next-line no-loop-func
             .then((res) =>{
+                    console.log("Fetching Season data")
                     const json = res.data;
                     let allEps = json.episodes
                     let datapoints = []
-                    
+
                     allEps.forEach(episode => {
+                        console.log("Fetching episode ", episode.name)
                         datapoints.push({label: episode.name, x: epCounter, y:episode.vote_average})
                         epCounter+=1
                     });
@@ -103,13 +119,17 @@ function Graph({setShow,showInput}) {
                         dataPoints: datapoints
                     }
                     addToDataset(dataset)
-                    chart.render()
                     setLoading(false);
                     }
                 )
+            .catch(()=>{
+                console.log("Could not fetch episode data")
+                return
+            })
         }
+        return 200
     }
-    function searchShow() {
+    async function searchShow() {
         if(!showInput){
             return
         }
@@ -117,11 +137,13 @@ function Graph({setShow,showInput}) {
         // Clear out old show
         setDataSet([])
         setSeasonCount(0)
-        getShowInfo(showInput)
+        await getShowInfo(showInput).then((res)=>{
+            setLoading(false)
+        })
     }
 
     if  (isLoading) {
-        getShowInfo("Avatar")
+        getShowInfo("Breaking Bad")
     } else {
         return (
             <>
