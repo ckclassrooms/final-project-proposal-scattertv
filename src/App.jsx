@@ -11,7 +11,6 @@ function App() {
         <h4>
           ScatterTV
         </h4>
-
       </header>
 		<div className="showInfo">
 			<>

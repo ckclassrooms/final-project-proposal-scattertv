@@ -65,7 +65,6 @@ function Graph({setShow,showInput}) {
     var chart = new CanvasJSChart("chartContainer", options);
 
     async function getShowInfo  (showInput) {
-        console.log(showInput)
         await axios("https://api.themoviedb.org/3/search/tv?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US&page=1&query="+showInput+"&include_adult=false")
         .then((res) =>{
             const json = res.data;
@@ -75,6 +74,9 @@ function Graph({setShow,showInput}) {
             setShowID(json.results[0]['id']);
 
         })
+        if (!showID){
+            return
+        }
         await axios("https://api.themoviedb.org/3/tv/"+showID+"?api_key="+process.env.REACT_APP_TMDBKEY+"&language=en-US")
         .then((res) =>{
             const json = res.data
@@ -97,6 +99,7 @@ function Graph({setShow,showInput}) {
                         showInLegend:true,
                         name: 'Season '+i,
                         type: "spline",
+                        label: 'Season '+i,
                         dataPoints: datapoints
                     }
                     addToDataset(dataset)
@@ -107,6 +110,9 @@ function Graph({setShow,showInput}) {
         }
     }
     function searchShow() {
+        if(!showInput){
+            return
+        }
         setShow(showInput)
         // Clear out old show
         setDataSet([])
