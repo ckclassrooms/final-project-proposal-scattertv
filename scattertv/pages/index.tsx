@@ -14,9 +14,9 @@ export async function getStaticProps() {
 
 
 
-function Home({title}) {
+function Home(title: String) {
   const router = useRouter()
-  let [employees, setEmployees] = useState([])
+  let [employees, setEmployees] = useState<any>([])
   const searchPartners = async (search: string) => {
     if (search.length === 0) {
       setEmployees([])
@@ -37,7 +37,7 @@ function Home({title}) {
             searchResults.push([showName, showID, posterPath])
             totalResults += 1
           }
-          setEmployees(searchResults)
+          setEmployees(searchResults || [])
         }
       )
 

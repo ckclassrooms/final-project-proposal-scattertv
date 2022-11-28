@@ -17,6 +17,7 @@ import {
 } from 'chart.js';
 
 import {Line} from "react-chartjs-2"
+import { cc, ad } from 'chart.js/dist/chunks/helpers.core'
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -62,11 +63,11 @@ export const options = {
     },
 
   },
-};
+} as const;
 
 
 
-function showGraph(props) {
+function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown> }) {
   const router = useRouter()
   if (router.isFallback){
     return <div>Loading...</div>
@@ -118,16 +119,15 @@ function showGraph(props) {
 // This function gets called at build time on server-side.
 // It may be called again, on a serverless function, if
 // revalidation is enabled and a new request comes in
-export async function getStaticProps(context) {
+export async function getStaticProps(context: { params: any }) {
   
   const {params} = context
   const res = await fetch("https://api.themoviedb.org/3/tv/"+params.showID+"?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US")
   const data = await res.json()
   let sznNumbers = data.number_of_seasons
   let epCounter = 1
-  const graphData = {
-    datasets: [
-    ],
+  let graphData = {
+    datasets: [{}]
   };
   for(var i =1; i <= sznNumbers; ++i){
     const seasonRes = await fetch("https://api.themoviedb.org/3/tv/"+params.showID+"/season/"+String(i)+"?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US")
@@ -135,14 +135,14 @@ export async function getStaticProps(context) {
     const color = gen().rgbString();
     let seasonGraphData = {
       label: 'Season ' + String(i),
-      data: [
-      ],
+      data: [{}],
       pointHitRadius: 40,
       pointHoverRadius: 10,
       borderColor: color,
       backgroundColor: color,
       tension: 0.4,
     }
+
 
     for(var j = 0; j < seasonData.episodes.length; ++j){
       let epData = seasonData.episodes[j]
@@ -182,4 +182,4 @@ export async function getStaticPaths() {
   }], fallback:true }
 }
 
-export default showGraph
+export default ShowGraph
