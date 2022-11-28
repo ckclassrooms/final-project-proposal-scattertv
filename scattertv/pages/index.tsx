@@ -15,10 +15,12 @@ export async function getStaticProps() {
 
 function Home(title: String) {
   const router = useRouter()
-  let [employees, setEmployees] = useState<any>([])
-  const searchPartners = async (search: string) => {
+  let [showSearch, setShowSearch] = useState<any>([])
+  let [isLoading, setLoading] = useState(false);
+
+  const searchShow = async (search: string) => {
     if (search.length === 0) {
-      setEmployees([])
+      setShowSearch([])
     }
     if (search.length >= 2) {
       await axios("https://api.themoviedb.org/3/search/tv?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page=1&query=" + search + "&include_adult=false").then(
@@ -36,7 +38,7 @@ function Home(title: String) {
             searchResults.push([showName, showID, posterPath])
             totalResults += 1
           }
-          setEmployees(searchResults || [])
+          setShowSearch(searchResults || [])
         }
       )
 
@@ -44,7 +46,7 @@ function Home(title: String) {
     return 'Show Found!'
   }
 
-  var employeeslist = employees
+  var showRes = showSearch
   return (
     <div className={styles.container}>
       <Head>
@@ -62,29 +64,29 @@ function Home(title: String) {
           type="text"
           // className="md:w-1/2"
           onChange={(e) => {
-            searchPartners(e.target.value)
+            searchShow(e.target.value)
           }
           }
         />
 
         <div className="hidden lg:block">
-          <table >
+        {isLoading ? <p>Loading Show...</p> :
+          <table>
             <tbody>
-              {employeeslist.map(emp => (
+              {showRes.map(emp => (
                 <tr key={emp}>
                   <td className={styles.resultCellImg} onClick={() => {
                   }}><img width='75px' src={emp[2]}></img></td>
                   <td className={styles.resultCellName} onClick={() => {
+                    setLoading(true)
                     router.push('/shows/'+emp[1])
-
                   }}>{emp[0]}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        }
         </div>
-
-
 
         <div className={styles.grid}>
           <a href="https://nextjs.org/docs" className={styles.card}>

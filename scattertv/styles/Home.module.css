@@ -5,11 +5,9 @@
 .containerShowPage {
   background-color: #242333;
   padding: 0 2rem;
-  min-height : '100vh'
 
 }
 .main {
-  min-height: 50vh;
   padding: 2rem 0;
   flex: 1;
   display: flex;
@@ -71,9 +69,30 @@
   font-size: 34px;
 
 }
-.graphID{
-
+.showHeader{
+  display:flex;
+  align-items: center;
 }
+
+.returnButton{
+  position:absolute;
+}
+.returnButton:hover,
+.returnButton:focus{
+  cursor: pointer;
+  color: #57B282;
+  border-color: #57B282;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.title {
+  text-align: center;
+  align-items: center;
+  margin: auto;
+  line-height: 1.0;
+  font-size: 4rem;
+}
+
+
 
 .tableResults {
   display: flex;
@@ -95,19 +114,13 @@
 .resultCellName:focus,
 .resultCellName:active {
   cursor: pointer;
-  color: #0070f3;
-  border-color: #0070f3;
+  color: #57B282;
+  border-color: #57B282;
   background-color: #222;
   transition: color 0.15s ease, border-color 0.15s ease;
 
 }
 
-
-.title {
-  margin: 0;
-  line-height: 1.0;
-  font-size: 4rem;
-}
 
 .title,
 .description {
