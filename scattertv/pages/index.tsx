@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { IconLoader, IconSearch, Input } from '@supabase/ui'
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
@@ -58,22 +57,13 @@ function Home(title: String) {
       </h1>
 
       <main className={styles.main}>
-        <Input
-          size="small"
-          icon={<IconSearch />}
+        <input
           placeholder="Search..."
           type="text"
           // className="md:w-1/2"
           onChange={(e) => {
             searchPartners(e.target.value)
           }
-          }
-          actions={
-            (
-              <span className="mr-1 animate-spin text-white">
-                <IconLoader />
-              </span>
-            )
           }
         />
 

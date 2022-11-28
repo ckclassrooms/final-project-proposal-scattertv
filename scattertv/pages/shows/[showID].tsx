@@ -2,7 +2,7 @@ import {useRouter} from 'next/router'
 import axios from 'axios'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
-import { IconLoader, IconArrowLeft, Button } from '@supabase/ui'
+
 var gen = require('color-generator');
 
 import {
@@ -88,10 +88,8 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
       </Head>
       
       <div className={styles.header}>
-          <Button
+          <button
                   className={styles.btn}
-                  size="large"
-                  icon={<IconArrowLeft /> }
                   onClick={() => {
                     router.push('/')
                   }}
