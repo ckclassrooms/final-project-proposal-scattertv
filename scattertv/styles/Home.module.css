@@ -78,6 +78,46 @@
   border-color: #57B282;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
+.signedOnButtons{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right:0;
+}
+.signOnButton{
+  position: absolute;
+  right:0;
+  margin-left:10px
+}
+
+.profileButton{
+  right:0;
+  margin-left:10px
+}
+.profileButton:hover,
+.profileButton:focus{
+  cursor: pointer;
+  color: #57B282;
+  border-color: #57B282;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.signOnButton:hover,
+.signOnButton:focus{
+  cursor: pointer;
+  color: #57B282;
+  border-color: #57B282;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  
+}
+
+
+.loginBox{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+
+}
 .title {
   text-align: center;
   align-items: center;

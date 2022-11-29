@@ -4,7 +4,7 @@ import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 
 export async function getStaticProps() {
@@ -28,7 +28,6 @@ const auth = getAuth(app);
 
 
 function Home(title: String) {
-  console.log(title)
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
   let [isLoading, setLoading] = useState(false);
@@ -46,6 +45,7 @@ function Home(title: String) {
         console.log("signed out")
       }
     })
+  
   },[])
 
 
@@ -86,6 +86,10 @@ function Home(title: String) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.showHeader}>
+        <a className={styles.returnButton} onClick={()=>{
+            router.push('/')
+        }}> &lt; return to homepage</a>
+
         <h1 className={styles.title}>
           <a>ScatterTV</a>
         </h1>
@@ -107,14 +111,12 @@ function Home(title: String) {
             router.push('/login')
         }}> sign on</a>
         }
-
       </div>
 
       <main className={styles.main}>
         <input
           placeholder="Search..."
           type="text"
-          // className="md:w-1/2"
           onChange={(e) => {
             searchShow(e.target.value)
           }
@@ -142,12 +144,6 @@ function Home(title: String) {
         </div>
 
         <div className={styles.grid}>
-          <a  className={styles.card} onClick={()=>{
-                router.push('/top100/')
-          }}>
-            <h2>Top 100 Shows &rarr;</h2>
-            <p>A list of top 100 most popular shows.</p>
-          </a>
 
           <a href="https://nextjs.org/learn" className={styles.card}>
             <h2>Random Show &rarr;</h2>

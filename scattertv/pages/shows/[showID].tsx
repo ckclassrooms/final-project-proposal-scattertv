@@ -3,8 +3,26 @@ import axios from 'axios'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 
 var gen = require('color-generator');
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
+  authDomain: "scattertv-b89bc.firebaseapp.com",
+  projectId: "scattertv-b89bc",
+  storageBucket: "scattertv-b89bc.appspot.com",
+  messagingSenderId: "323125299537",
+  appId: "1:323125299537:web:f2001ab206765c49546b70",
+  measurementId: "G-656M6GP9TL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 import {
   Chart as ChartJS,
@@ -15,11 +33,47 @@ import {
   Title,
   Tooltip,
   Legend,
+  plugins,
 } from 'chart.js';
 
 import {Line} from "react-chartjs-2"
 import { cc, ad } from 'chart.js/dist/chunks/helpers.core'
 ChartJS.register(
+  {
+    id: 'graphCursor',
+
+    afterInit: (chart, args, opts) => {
+      chart['graphCursor'] = {
+        x: 0,
+        y: 0,
+      }
+    },
+    afterEvent: (chart, args) => {
+      const {inChartArea} = args
+      const {type,x,y} = args.event
+
+      chart['graphCursor'] = {x, y, draw: inChartArea}
+      chart.draw()
+    },
+    afterDraw: (chart, args, opts) => {
+      let {ctx} = chart
+      const {top, bottom, left, right} = chart.chartArea
+      const {x, y, draw} = chart['graphCursor']
+      if (!draw) return
+
+      ctx.save()
+      
+      ctx.beginPath()
+      ctx.lineWidth = 3
+      ctx.strokeStyle = '#57B282'
+      ctx.setLineDash([3, 3]) 
+      ctx.moveTo(left, y)
+      ctx.lineTo(right, y)
+      ctx.stroke()
+      
+      ctx.restore()
+    }
+  },
   CategoryScale,
   LinearScale,
   PointElement,
@@ -41,6 +95,9 @@ export const options = {
   },
   showToolTips:true,
   maintainAspectRatio: false,
+  tooltip: {
+  mode: 'x-axis'
+},
   scales: {
     x: {
       type: 'linear',
@@ -72,10 +129,27 @@ export const options = {
 function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown> }) {
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
+  let [isSignedIn, setSignin] = useState(false);
+  // Check if user is signed in with firebase
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log("signed in!")
+        setSignin(true)
+        // ...
+      } else {
+        setSignin(false)
+        console.log("signed out")
+      }
+    })
+  },[])
 
   if (router.isFallback){
     return <div>Loading...</div>
   }
+
+
 
   let showData = props.res
   let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path
@@ -123,6 +197,24 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
         <h1 className={styles.title}>
           <a>ScatterTV</a>
         </h1>
+        {isSignedIn ? 
+          <div className={styles.signedOnButtons}>
+              <a className={styles.profileButton} onClick={()=>{
+                    router.push('/profile')
+                }}>my profile</a>
+                <a className={styles.profileButton} onClick={()=>{      
+                  signOut(auth).then(() => {
+                    // Sign-out successful.
+                  }).catch((error) => {
+                    // An error happened.
+                  });
+                }}>signout</a>
+          </div>   
+          :
+           <a className={styles.signOnButton} onClick={()=>{
+            router.push('/login')
+        }}> sign on</a>
+        }
       </div>
       <main className={styles.main}>
         <input
@@ -161,7 +253,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
                   {showData.overview}
               </div>
               <div className={styles.graph}>
-                <Line  className={styles.graphID} data={props.data} height="500px" options={options}/>
+                <Line className={styles.graphID} data={props.data} height="500px" options={options} />
               </div>
           </div>
       </div>
@@ -193,7 +285,7 @@ export async function getStaticProps(context: { params: any }) {
     let seasonGraphData = {
       label: 'Season ' + String(i),
       data: [],
-      pointHitRadius: 40,
+      pointHitRadius: 20,
       pointHoverRadius: 10,
       borderColor: color,
       backgroundColor: color,

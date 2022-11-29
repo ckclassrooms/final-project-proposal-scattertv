@@ -4,50 +4,15 @@ import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-
-export async function getStaticProps() {
-  return {
-    props: { title: 'My Title', content: '...' }
-  }
-}
-const firebaseConfig = {
-  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
-  authDomain: "scattertv-b89bc.firebaseapp.com",
-  projectId: "scattertv-b89bc",
-  storageBucket: "scattertv-b89bc.appspot.com",
-  messagingSenderId: "323125299537",
-  appId: "1:323125299537:web:f2001ab206765c49546b70",
-  measurementId: "G-656M6GP9TL"
-};
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 
 
-function Home(title: String) {
-  console.log(title)
+
+function TopShows(title: String) {
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
   let [isLoading, setLoading] = useState(false);
-  let [isSignedIn, setSignin] = useState(false);
-  // Check if user is signed in with firebase
-  useEffect(()=>{
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
-        console.log("signed in!")
-        setSignin(true)
-        // ...
-      } else {
-        setSignin(false)
-        console.log("signed out")
-      }
-    })
-  },[])
-
+  let [showList, setShowList] = useState<any>([])
 
 
   const searchShow = async (search: string) => {
@@ -77,6 +42,26 @@ function Home(title: String) {
     }
     return 'Show Found!'
   }
+
+  const topShows = async ()=>{
+    let searchResults = []
+    let page = 1
+    let showCount = 1;
+    while (showCount < 100){
+    const top100 = await fetch("https://api.themoviedb.org/3/tv/popular?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page="+page)
+    const data100 = await top100.json()
+    page+=1
+    for (let i = 0; i < data100.results.length; ++i){
+        showCount+=1
+        let posterPath = "https://image.tmdb.org/t/p/w500" + data100.results[i].poster_path
+        searchResults.push({name:data100.results[i].name, id:data100.results[i].id, poster_path:posterPath})
+    }
+    }
+    setShowList(searchResults)
+  }
+
+  topShows()
+
   var showRes = showSearch
   return (
     <div className={styles.container}>
@@ -86,28 +71,13 @@ function Home(title: String) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.showHeader}>
+        <a className={styles.returnButton} onClick={()=>{
+            router.push('/')
+        }}> &lt; return to homepage</a>
+
         <h1 className={styles.title}>
           <a>ScatterTV</a>
         </h1>
-        {isSignedIn ? 
-          <div className={styles.signedOnButtons}>
-              <a className={styles.profileButton} onClick={()=>{
-                    router.push('/profile')
-                }}>my profile</a>
-                <a className={styles.profileButton} onClick={()=>{      
-                  signOut(auth).then(() => {
-                    // Sign-out successful.
-                  }).catch((error) => {
-                    // An error happened.
-                  });
-                }}>signout</a>
-          </div>   
-          :
-           <a className={styles.signOnButton} onClick={()=>{
-            router.push('/login')
-        }}> sign on</a>
-        }
-
       </div>
 
       <main className={styles.main}>
@@ -120,9 +90,7 @@ function Home(title: String) {
           }
           }
         />
-
-
-        <div className="hidden lg:block">
+                <div className="hidden lg:block">
         {isLoading ? <p>Loading Show...</p> :
           <table>
             <tbody>
@@ -141,28 +109,21 @@ function Home(title: String) {
         }
         </div>
 
-        <div className={styles.grid}>
-          <a  className={styles.card} onClick={()=>{
-                router.push('/top100/')
-          }}>
-            <h2>Top 100 Shows &rarr;</h2>
-            <p>A list of top 100 most popular shows.</p>
-          </a>
+          <table>
+            <tbody>
+              {showList.map(emp => (
+                <tr key={emp}>
+                  <td className={styles.resultCellImg} onClick={() => {
+                  }}><img width='150px' src={emp.poster_path}></img></td>
+                  <td className={styles.resultCellName} onClick={() => {
+                    setLoading(true)
+                    router.push('/shows/'+emp.id)
+                  }}>{emp.name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Random Show &rarr;</h2>
-            <p>Route to a random show in the top 100 most popular shows.</p>
-          </a>
-
-          <a
-            href="https://cs484-website.pages.dev/syllabus"
-            className={styles.card}
-          >
-            <h2>Project  &rarr;</h2>
-            <p>This project was developed for CS484; a Secure Web App Development Course</p>
-          </a>
-
-        </div>
       </main>
 
       <footer className={styles.footer}>
@@ -180,4 +141,5 @@ function Home(title: String) {
     </div>
   )
 }
-export default Home
+
+export default TopShows
