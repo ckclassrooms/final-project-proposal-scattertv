@@ -202,7 +202,7 @@ function Home(title: String) {
                       router.push('/shows/'+emp[1])
                     }}><a>{emp[0]}</a></td>
                     <td className={styles.removeShowCell} onClick={() => {
-                      removeShow(emp[0],emp[1],emp[2])
+                      removeShow(emp[0])
                     }}><a className={styles.removeShow}>Remove</a></td>
 
                   </tr>
