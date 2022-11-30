@@ -77,7 +77,6 @@ function Home(title: String) {
         shows:newListOfShows
       });
       
-      console.log("Document written with ID: ", docRef);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -203,7 +202,7 @@ function Home(title: String) {
                       router.push('/shows/'+emp[1])
                     }}><a>{emp[0]}</a></td>
                     <td className={styles.removeShowCell} onClick={() => {
-                      removeShow(emp[0])
+                      removeShow(emp[1])
                     }}><a className={styles.removeShow}>Remove</a></td>
 
                   </tr>
