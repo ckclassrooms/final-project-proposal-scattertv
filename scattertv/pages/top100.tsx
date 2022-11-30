@@ -4,15 +4,44 @@ import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
+import { initializeApp } from 'firebase/app';
 
+import { getAuth , signOut, onAuthStateChanged} from "firebase/auth";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
+  authDomain: "scattertv-b89bc.firebaseapp.com",
+  projectId: "scattertv-b89bc",
+  storageBucket: "scattertv-b89bc.appspot.com",
+  messagingSenderId: "323125299537",
+  appId: "1:323125299537:web:f2001ab206765c49546b70",
+  measurementId: "G-656M6GP9TL"
+};
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-function TopShows(title: String) {
+function TopShows(props) {
+  let showList = props.topShows
   const router = useRouter()
-  let [showSearch, setShowSearch] = useState<any>([])
+  let [isSignedIn, setSignin] = useState(false);
+  // Check if user is signed in with firebase
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log("signed in!")
+        setSignin(true)
+        // ...
+      } else {
+        setSignin(false)
+        console.log("signed out")
+      }
+    })
+  },[])
+
+  let [showSearch, setShowSearch] = useState([])
   let [isLoading, setLoading] = useState(false);
-  let [showList, setShowList] = useState<any>([])
 
 
   const searchShow = async (search: string) => {
@@ -43,24 +72,7 @@ function TopShows(title: String) {
     return 'Show Found!'
   }
 
-  const topShows = async ()=>{
-    let searchResults = []
-    let page = 1
-    let showCount = 1;
-    while (showCount < 100){
-    const top100 = await fetch("https://api.themoviedb.org/3/tv/popular?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page="+page)
-    const data100 = await top100.json()
-    page+=1
-    for (let i = 0; i < data100.results.length; ++i){
-        showCount+=1
-        let posterPath = "https://image.tmdb.org/t/p/w500" + data100.results[i].poster_path
-        searchResults.push({name:data100.results[i].name, id:data100.results[i].id, poster_path:posterPath})
-    }
-    }
-    setShowList(searchResults)
-  }
 
-  topShows()
 
   var showRes = showSearch
   return (
@@ -79,7 +91,26 @@ function TopShows(title: String) {
         <h1 className={styles.title}>
           <a>ScatterTV</a>
         </h1>
+        {isSignedIn ? 
+          <div className={styles.signedOnButtons}>
+              <a className={styles.profileButton} onClick={()=>{
+                    router.push('/profile')
+                }}>my profile</a>
+                <a className={styles.profileButton} onClick={()=>{      
+                  signOut(auth).then(() => {
+                    // Sign-out successful.
+                  }).catch((error) => {
+                    // An error happened.
+                  });
+                }}>signout</a>
+          </div>   
+          :
+           <a className={styles.signOnButton} onClick={()=>{
+            router.push('/login')
+        }}> sign on</a>
+        }
       </div>
+
 
       <main className={styles.main}>
         <input
@@ -115,7 +146,8 @@ function TopShows(title: String) {
               {showList.map(emp => (
                 <tr key={emp}>
                   <td className={styles.resultCellImg} onClick={() => {
-                  }}><img width='150px' src={emp.poster_path}></img></td>
+                  }}><Image width={144} height={215} src={emp.poster_path} alt={emp.showName}/>
+                    </td>
                   <td className={styles.resultCellName} onClick={() => {
                     setLoading(true)
                     router.push('/shows/'+emp.id)
@@ -144,6 +176,46 @@ function TopShows(title: String) {
     </div>
 
   )
+}
+
+// This function gets called at build time on server-side.
+// It may be called again, on a serverless function, if
+// revalidation is enabled and a new request comes in
+export async function getStaticProps(context: { params: any }) {
+  const {params} = context
+  const topShows = async ()=>{
+    let searchResults = []
+    let showCount = 1;
+    let page = 1
+    // While we only use 100 of these shows, we query the top 3000
+    // due to tmdb not organizing responses based on vote counts
+    
+    // This should be alright to do. TMDB has stated they don't have
+    // Query limits
+    while (showCount < 3000){
+      const top100 = await fetch("https://api.themoviedb.org/3/tv/popular?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page="+page)
+      const data100 = await top100.json()
+      page+=1
+      for (let i = 0; i < data100.results.length; ++i){
+          showCount+=1
+          let posterPath = "https://image.tmdb.org/t/p/w500" + data100.results[i].poster_path
+          searchResults.push({name:data100.results[i].name, id:data100.results[i].id, poster_path:posterPath, vote_count: data100.results[i].vote_count})
+      }
+    }
+      
+      searchResults.sort((a, b) => {
+        return b.vote_count- a.vote_count ;
+    });
+    searchResults.splice(100,2900)
+    return searchResults;
+  }
+  let searchRes = await topShows()
+
+  return{
+    props:{
+      topShows: searchRes,
+    },
+  }
 }
 
 export default TopShows

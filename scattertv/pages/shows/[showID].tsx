@@ -357,6 +357,9 @@ export async function getStaticProps(context: { params: any }) {
       backgroundColor: color,
       tension: 0.4,
     }
+    if(seasonData.episodes.length === 0){
+      continue
+    }
     // Assign datapoints based on each episode in season
     for(var j = 0; j < seasonData.episodes.length; ++j){
       let epData = seasonData.episodes[j]
@@ -364,7 +367,6 @@ export async function getStaticProps(context: { params: any }) {
         let dataSet= { x:epCounter, y:epData.vote_average}
         seasonGraphData.data.push(dataSet)
         epCounter+=1 
-        labels.push('weee')
       }
     }
     graphData.datasets.push(seasonGraphData)
