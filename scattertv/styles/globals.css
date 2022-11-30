@@ -1,12 +1,17 @@
 html,
 body {
+  
   background-color: #242333;
-
   padding: 0;
   margin: 0;
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
   Bitstream Vera Sans Mono, Courier New, monospace;
 }
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 
 a {
   color: inherit;

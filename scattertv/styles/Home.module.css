@@ -1,13 +1,17 @@
 .container {
+  min-height: 95vh;
   background-color: #242333;
 }
 
 .containerShowPage {
   background-color: #242333;
   padding: 0 2rem;
+  min-height: 95vh;
+
 
 }
 .main {
+
   padding: 2rem 0;
   flex: 1;
   display: flex;
@@ -16,19 +20,13 @@
   align-items: center;
 }
 
-.footer {
-  display: flex;
-  flex: 1;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
-  align-items: center;
-}
 
 .footer a {
+  min-height: 5vh;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
 }
 
 .title a {
@@ -44,6 +42,7 @@
   display: flex;
   text-decoration: none;
   column-gap: 50px;
+  
 }
 
 .graphSite{
@@ -51,6 +50,7 @@
   display: flex;
   align-items: center;
   column-gap: 10px;
+  
 }
 .bioContainer{
   display: flex;
@@ -118,6 +118,7 @@
 
 }
 .title {
+  
   text-align: center;
   align-items: center;
   margin: auto;
@@ -219,22 +220,26 @@
 }
 
 .card {
+  padding-top: 30px;
   margin: 1rem;
   padding: 1.5rem;
   text-align: left;
   color: inherit;
   text-decoration: none;
+  height:200px;
   border: 1px solid #eaeaea;
   border-radius: 10px;
   max-width: 300px;
+  cursor: pointer;
 }
 
 .card:hover,
 .card:focus,
 .card:active {
+  
   transition: color 0.15s ease, border-color 0.15s ease;
-  color: #0070f3;
-  border-color: #0070f3;
+  color: #57B282;
+  border-color: #57B282;
 }
 
 .card h2 {

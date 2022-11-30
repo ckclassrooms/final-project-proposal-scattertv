@@ -64,6 +64,7 @@ function TopShows(title: String) {
 
   var showRes = showSearch
   return (
+    <div>
     <div className={styles.container}>
       <Head>
         <title>ScatterTV</title>
@@ -126,19 +127,22 @@ function TopShows(title: String) {
 
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://www.themoviedb.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/tmdbLogo.svg" alt="TMDB Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
+      <footer className={styles.footer}>
+              <a
+                href="https://www.themoviedb.org"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Powered by{' '}
+                <span className={styles.logo}>
+                  <Image src="/tmdbLogo.svg" alt="TMDB Logo" width={72} height={16} />
+                </span>
+              </a>
+      </footer>
+
+    </div>
+
   )
 }
 
