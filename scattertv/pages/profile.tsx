@@ -6,6 +6,7 @@ import axios from "axios";
 import { useRouter } from 'next/router'
 import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
+import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
 
 export async function getStaticProps() {
   return {
@@ -24,31 +25,77 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 
 
 function Home(title: String) {
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
+  let [userShows, setUserShows] = useState<any>([])
   let [isLoading, setLoading] = useState(false);
   let [isSignedIn, setSignin] = useState(false);
+  let [uid,setUID] = useState('')
+
   // Check if user is signed in with firebase
   useEffect(()=>{
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         const uid = user.uid;
         console.log("signed in!")
         setSignin(true)
-        // ...
+        setUID(uid)
+        let firstDoc = await doc(db, "users", uid);
+        const docSnap = await getDoc(firstDoc);
+        let showsReceived = docSnap.data();
+        let addShow = true;
+        let scrubbedShows = []
+        const result = showsReceived.shows.map((obj) => {
+          scrubbedShows.push([obj.showName,obj.showID,obj.posterPath])
+        })
+        setUserShows(scrubbedShows)
+
       } else {
         setSignin(false)
         console.log("signed out")
       }
-    })
+    });
   
   },[])
+  async function removeShow (showID)  {
+    try {
+      let firstDoc = doc(db, "users", uid);
+      const docSnap = await getDoc(firstDoc);
+      let showsReceived = docSnap.data();
+      let newListOfShows = []
+      const result = showsReceived.shows.map((obj) => {
+        if(obj.showID !== showID){
+          newListOfShows.push(obj)
+        }
+      });
+      let docRef = await setDoc(doc(db, "users", uid), {
+        shows:newListOfShows
+      });
+      
+      console.log("Document written with ID: ", docRef);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
 
-
+    try{
+      let firstDoc = doc(db, "users", uid);
+      const docSnap = await getDoc(firstDoc);
+      let showsReceived = docSnap.data();
+      let addShow = true;
+      let scrubbedShows = []
+      const result = showsReceived.shows.map((obj) => {
+        scrubbedShows.push([obj.showName,obj.showID,obj.posterPath])
+      })
+      setUserShows(scrubbedShows)
+    } catch (e) {
+      console.log("Error Repopulating Shows!")
+    }
+  }
 
   const searchShow = async (search: string) => {
     if (search.length === 0) {
@@ -142,6 +189,30 @@ function Home(title: String) {
           </table>
         }
         </div>
+
+        <div className="hidden lg:block">
+          <table className={styles.userShowsTable}>
+              <tbody>
+                {userShows.map(emp => (
+                  <tr className={styles.userShowRows} key={emp}>
+                    <td className={styles.resultCellImg} onClick={() => {
+                    }}><img width='150px' src={emp[2]}></img></td>
+                    <td className={styles.resultCellName} onClick={() => {
+                      setLoading(true)
+                      router.push('/shows/'+emp[1])
+                    }}><a>{emp[0]}</a></td>
+                    <td className={styles.removeShowCell} onClick={() => {
+                      removeShow(emp[0],emp[1],emp[2])
+                    }}><a className={styles.removeShow}>Remove</a></td>
+
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+        </div>
+
+
 
         <div className={styles.grid}>
 

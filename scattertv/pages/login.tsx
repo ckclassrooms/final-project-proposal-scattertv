@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import {getFirestore, doc,addDoc, setDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 export async function getStaticProps() {
   return {
@@ -27,15 +27,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
 function firebaseSignUp(email,password): boolean{
     createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       // Signed in 
       const user = userCredential.user;
+
       console.log("Signed in as ", user)
+      // Create firebase entry for user storage
+        try {
+            await setDoc(doc(db, "users", user.uid), {
+                'email': email,
+              });
+            
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+    
       return true
       
-      // ...
     })
     .catch((error) => {
       const errorCode = error.code;

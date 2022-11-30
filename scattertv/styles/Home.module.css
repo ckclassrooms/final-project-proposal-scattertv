@@ -101,7 +101,6 @@
   border-color: #57B282;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-
 .signOnButton:hover,
 .signOnButton:focus{
   cursor: pointer;
@@ -135,14 +134,20 @@
   padding: 1rem 0;
   border: 1px solid #eaeaea;
 }
-
+.userShowsTable{
+  border-spacing:0; /* Removes the cell spacing via CSS */ 
+  border-collapse: collapse;
+}
 .resultCellImg{
   padding-left: 5px;
-
+  background-color: #222;
 }
 .resultCellName{
-  padding-left: 5px;
+  width:200px;
+
   text-align: center;
+  background-color: #222;
+
 }
 .resultCellName:hover,
 .resultCellName:focus,
@@ -154,7 +159,38 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 
 }
+.removeShow{
+  margin-left:10px;
+  width:60px;
+  text-align: center;
+}
+.removeShow:hover,
+.removeShow:focus{
+  cursor: pointer;
+  color: black;
+  border-color: black;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
 
+.removeShowCell{
+  text-align: center;
+  font-size: 10px;
+  width:100px
+}
+.removeShowCell:hover,
+.removeShowCell:focus,
+.removeShowCell:active {
+  cursor: pointer;
+  color: black;
+  border-color: black;
+  background-color: #d02f2f;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.40s ease,  0.40s ease;
+}
+.userShowRows{
+  height: 150px;
+  width:100px;
+}
 
 .title,
 .description {

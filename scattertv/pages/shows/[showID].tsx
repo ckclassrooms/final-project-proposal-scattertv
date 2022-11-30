@@ -5,8 +5,7 @@ import styles from '../../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
-
+import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
 var gen = require('color-generator');
 
 const firebaseConfig = {
@@ -21,8 +20,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 import {
   Chart as ChartJS,
@@ -33,11 +32,11 @@ import {
   Title,
   Tooltip,
   Legend,
-  plugins,
 } from 'chart.js';
 
 import {Line} from "react-chartjs-2"
 import { cc, ad } from 'chart.js/dist/chunks/helpers.core'
+import { async } from '@firebase/util'
 ChartJS.register(
   {
     id: 'graphCursor',
@@ -82,8 +81,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-export const options = {
+export let options = {
   annotation: {
     annotations: [
       {
@@ -93,11 +91,9 @@ export const options = {
       }
     ]
   },
-  showToolTips:true,
+  showToolTips:false,
   maintainAspectRatio: false,
-  tooltip: {
-  mode: 'x-axis'
-},
+  responsive: true,
   scales: {
     x: {
       type: 'linear',
@@ -112,10 +108,16 @@ export const options = {
       grid:{
           display:false
         },
-      max:10,
+        max:10,
        }
   },
-  responsive: true,
+  tooltip: { 
+    callbacks: {
+                  label: function(tooltipItem, data) {
+                      return "Daily Ticket Sales: $ " + tooltipItem.yLabel;
+                  },
+              }
+      },
   plugins: {
     legend: {
       position: 'bottom' as const,
@@ -130,20 +132,46 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
   let [isSignedIn, setSignin] = useState(false);
+  let [uid,setUID] = useState('')
   // Check if user is signed in with firebase
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
+        setUID(uid)
         console.log("signed in!")
         setSignin(true)
-        // ...
       } else {
         setSignin(false)
         console.log("signed out")
       }
     })
   },[])
+  async function addShow (showName,showID,posterPath)  {
+    try {
+      let firstDoc = doc(db, "users", uid);
+
+      const docSnap = await getDoc(firstDoc);
+      let showsReceived = docSnap.data();
+      let showToAdd = {showID:showID,posterPath:posterPath,showName:showName};
+      let addShow = true;
+      const result = showsReceived.shows.map((obj) => {
+        if(obj.showName === showName){
+          addShow = false;
+        }
+      });
+      if(addShow){
+        showsReceived.shows.push(showToAdd)
+      }
+      let docRef = await setDoc(doc(db, "users", uid), {
+        shows:showsReceived.shows
+      },{ merge: true });
+      console.log("Document written with ID: ", docRef);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
+  
 
   if (router.isFallback){
     return <div>Loading...</div>
@@ -255,6 +283,20 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
               <div className={styles.graph}>
                 <Line className={styles.graphID} data={props.data} height="500px" options={options} />
               </div>
+              {
+                isSignedIn ?              
+                 <a className={styles.profileButton} onClick={()=>{
+                  let showID = props['showID'];
+                  let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path        
+                  let showName = showData.name
+                  console.log(showID,posterPath)
+                  console.log(isSignedIn)
+                  addShow(showName,showID,posterPath)
+                  router.push('/profile')
+  
+                }}>add to library</a> : <a>sign in to add this show to your library!</a>
+              }
+
           </div>
       </div>
     </div>
@@ -273,7 +315,10 @@ export async function getStaticProps(context: { params: any }) {
   const data = await res.json()
   let sznNumbers = data.number_of_seasons
   let epCounter = 1
+  let labels = [];
+
   let graphData = {
+    labels:labels,
     datasets: []
   };
   // Fetch individual season data
@@ -282,6 +327,7 @@ export async function getStaticProps(context: { params: any }) {
     const seasonData = await seasonRes.json()
     // Random coloring for each season
     const color = gen().rgbString();
+    
     let seasonGraphData = {
       label: 'Season ' + String(i),
       data: [],
@@ -295,14 +341,15 @@ export async function getStaticProps(context: { params: any }) {
     for(var j = 0; j < seasonData.episodes.length; ++j){
       let epData = seasonData.episodes[j]
       if (epData.vote_average!== 0){
-        let dataSet= {x:epCounter, y:epData.vote_average}
+        let dataSet= { x:epCounter, y:epData.vote_average}
         seasonGraphData.data.push(dataSet)
-        epCounter+=1  
+        epCounter+=1 
+        labels.push('weee')
       }
     }
     graphData.datasets.push(seasonGraphData)
   }
-
+  console.log(graphData)
   return{
     props:{
       showID: params.showID,
@@ -311,7 +358,7 @@ export async function getStaticProps(context: { params: any }) {
     },
     revalidate: 10, // In seconds
   }
-  }
+}
 
 // This function gets called at build time on server-side.
 // It may be called again, on a serverless function, if
