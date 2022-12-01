@@ -56,7 +56,7 @@ function Home(title: String) {
         setUserShows(scrubbedShows)
 
       } else {
-        setSigin(false)
+        setSignin(false)
         console.log("signed out")
         router.push('/')
       }
