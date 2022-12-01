@@ -187,7 +187,7 @@ function TopShows(props) {
                   </div> :
                   <div className={styles.addtoLibrary}>
                   <a  onClick={()=>{
-                      router.push('/profile/')
+                      router.push('/login/')
                     }}> sign in to add show</a>
                 </div>
                   }
