@@ -1,5 +1,6 @@
 .container {
   min-height: 95vh;
+  min-width: 100ch;
   background-color: #242333;
 }
 
@@ -7,11 +8,8 @@
   background-color: #242333;
   padding: 0 2rem;
   min-height: 95vh;
-
-
 }
 .main {
-
   padding: 2rem 0;
   flex: 1;
   display: flex;
@@ -169,10 +167,12 @@
   background-color: #222;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
+.topShows{
+  margin: 10vh;
 
+}
 
 .showListContainer{
-  margin: 10vh;
   width: 150vh;
   column-gap: 10px;
   height: 600px;

@@ -150,6 +150,12 @@ function Home() {
               <h2>Project  &rarr;</h2>
               <p>This project was developed for CS484 Secure Web App Development</p>
             </a>
+            <a className={styles.card} onClick={()=>{
+                  router.push('/analytics/')
+            }}>
+              <h2>Analytics &rarr;</h2>
+              <p>View stats that this website is tracking</p>
+            </a>
 
           </div>
         </main>

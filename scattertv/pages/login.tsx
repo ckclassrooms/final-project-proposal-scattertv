@@ -51,9 +51,7 @@ function firebaseSignUp(email,password): boolean{
       const user = userCredential.user;
       // Create firebase entry for user storage
       initalUserSetup(user.uid)
-    
       return true
-      
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -127,7 +125,10 @@ function Home(title: String) {
   });
 
   return (
+    
     <div>
+      <script src="https://accounts.google.com/gsi/client" async defer></script>
+
       <div className={styles.container}>
         <Head>
           <title>ScatterTV</title>
@@ -155,6 +156,19 @@ function Home(title: String) {
               }} >
             Login
           </button>
+        </div>
+        
+        <a>No Account? Sign up below!</a>
+        
+        <div className = {styles.loginBox}>
+          
+          <input type="text" placeholder="E-mail Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)} />
+          <input type="password" placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+          />
           <button className="login__btn login__google" onClick={()=> {setSignIn(firebaseSignUp(email,password))}} >
             Sign Up
           </button>
@@ -187,9 +201,6 @@ function Home(title: String) {
             sign in with google
           </button>
         </div>
-        
-        <a>No Account? Sign up below!</a>
-
 
         </main>
 
