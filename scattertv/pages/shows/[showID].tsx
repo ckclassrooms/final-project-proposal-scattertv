@@ -151,6 +151,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
   },[])
   async function addShow (showName,showID,posterPath)  {
     try {
+      console.log(uid)
       let firstDoc = doc(db, "users", uid);
 
       const docSnap = await getDoc(firstDoc);

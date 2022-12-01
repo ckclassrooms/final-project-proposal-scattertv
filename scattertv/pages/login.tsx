@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
 import {getFirestore, doc,addDoc, setDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup } from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth";
+import { GoogleAuthProvider , getAdditionalUserInfo} from "firebase/auth";
 
 export async function getStaticProps() {
   return {
@@ -31,23 +31,26 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+async function initalUserSetup(uid){
+  try {
+    let userDoc = await doc(db, 'users', uid)
+    await setDoc(userDoc, {
+          shows: [],
+        });
+      
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+
+}
 
 function firebaseSignUp(email,password): boolean{
     createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       // Signed in 
       const user = userCredential.user;
-
-      console.log("Signed in as ", user)
       // Create firebase entry for user storage
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                'email': email,
-              });
-            
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
+      initalUserSetup(user.uid)
     
       return true
       
@@ -163,6 +166,12 @@ function Home(title: String) {
                 const token = credential.accessToken;
                 // The signed-in user info.
                 const user = result.user;
+                const { isNewUser } = getAdditionalUserInfo(result)
+                if(isNewUser){
+                  initalUserSetup(user.uid)
+                }
+                router.push('/')
+        
               }).catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
