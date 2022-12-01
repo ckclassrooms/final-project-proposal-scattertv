@@ -135,6 +135,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
   let [showSearch, setShowSearch] = useState<any>([])
   let [isSignedIn, setSignin] = useState(false);
   let [uid,setUID] = useState('')
+
   // Check if user is signed in with firebase
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
@@ -151,6 +152,8 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
   },[])
   async function addShow (showName,showID,posterPath)  {
     try {
+      showStats(showName,showID,posterPath,true)
+      console.log(uid)
       let firstDoc = doc(db, "users", uid);
 
       const docSnap = await getDoc(firstDoc);
@@ -172,6 +175,42 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
       console.error("Error adding document: ", e);
     }
   }
+  async function showStats(showName,showID,posterPath,isAddingToAccount){
+    let showSnap = await getDoc(doc(db,"showStats",String(showID)))
+    let showReceived = showSnap.data();
+    if(showReceived === undefined){
+      await setDoc(doc(db, "showStats", String(showID)), {
+        showID:showID,
+        showName:showName,
+        posterPath:posterPath,
+        clickCount : 1,
+        addedCount : 0,
+      });
+    }else if(isAddingToAccount){
+      let showClickCount = showReceived.clickCount
+      let showAddedCount = showReceived.addedCount+1
+      await setDoc(doc(db, "showStats", String(showID)), {
+        showID:showID,
+        showName:showName,
+        posterPath:posterPath,
+        clickCount : showClickCount,
+        addedCount : showAddedCount,
+      });
+      return
+    }else{
+      console.log("else")
+      let showClickCount = showReceived.clickCount+1
+      let showAddedCount = showReceived.addedCount
+      await setDoc(doc(db, "showStats", String(showID)), {
+        showID:showID,
+        showName:showName,
+        posterPath:posterPath,
+        clickCount : showClickCount,
+        addedCount : showAddedCount,
+      });
+      return
+    }
+  }
   
 
   if (router.isFallback){
@@ -181,6 +220,8 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
 
 
   let showData = props.res
+  showStats(showData.name,showData.id,showData.poster_path,false)
+
   let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path
   // Query TMDB to get search results of a search string
   const searchShow = async (search: string) => {
@@ -291,9 +332,8 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
                     let showID = props['showID'];
                     let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path        
                     let showName = showData.name
-                    console.log(showID,posterPath)
-                    console.log(isSignedIn)
                     addShow(showName,showID,posterPath)
+                    showStats(showData.name,showData.id,showData.poster_path,true)
                     router.push('/profile')
     
                   }}>add to library</a> : <a>sign in to add this show to your library!</a>
