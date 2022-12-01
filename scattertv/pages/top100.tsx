@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
+import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
 
 import { getAuth , signOut, onAuthStateChanged} from "firebase/auth";
 
@@ -20,17 +21,21 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 function TopShows(props) {
   let showList = props.topShows
+  console.log(showList)
   const router = useRouter()
   let [isSignedIn, setSignin] = useState(false);
+  let [uid, setUID] = useState('')
   // Check if user is signed in with firebase
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
         console.log("signed in!")
+        setUID(uid)
         setSignin(true)
         // ...
       } else {
@@ -39,6 +44,29 @@ function TopShows(props) {
       }
     })
   },[])
+  async function addShow (showName,showID,posterPath)  {
+    try {
+      let firstDoc = doc(db, "users", uid);
+
+      const docSnap = await getDoc(firstDoc);
+      let showsReceived = docSnap.data();
+      let showToAdd = {showID:showID,posterPath:posterPath,showName:showName};
+      let addShow = true;
+      const result = showsReceived.shows.map((obj) => {
+        if(obj.showName === showName){
+          addShow = false;
+        }
+      });
+      if(addShow){
+        showsReceived.shows.push(showToAdd)
+      }
+      let docRef = await setDoc(doc(db, "users", uid), {
+        shows:showsReceived.shows
+      },{ merge: true });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
 
   let [showSearch, setShowSearch] = useState([])
   let [isLoading, setLoading] = useState(false);
@@ -71,7 +99,6 @@ function TopShows(props) {
     }
     return 'Show Found!'
   }
-
 
 
   var showRes = showSearch
@@ -140,22 +167,34 @@ function TopShows(props) {
           </table>
         }
         </div>
-
-          <table>
-            <tbody>
-              {showList.map(emp => (
-                <tr key={emp}>
-                  <td className={styles.resultCellImg} onClick={() => {
-                  }}><Image width={144} height={215} src={emp.poster_path} alt={emp.showName}/>
-                    </td>
-                  <td className={styles.resultCellName} onClick={() => {
-                    setLoading(true)
-                    router.push('/shows/'+emp.id)
-                  }}>{emp.name}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className={styles.showListContainer}>
+            {showList.map(show => (
+              <div className={styles.individualShow} key={show}>
+                <div className={styles.showButton} onClick={()=>{
+                  router.push('/shows/'+show.id)
+                }}>
+                  <Image width={288} height={430} src={show.poster_path} alt={show.showName}/>
+                  {show.name}
+                  <br></br>
+                  {show.vote_count} Likes
+                </div>
+                {isSignedIn ? 
+                  <div className={styles.addtoLibrary}>
+                    <a  onClick={()=>{
+                        addShow(show.name,show.id,show.poster_path)
+                        router.push('/profile/')
+                      }}> add to library</a>
+                  </div> :
+                  <div className={styles.addtoLibrary}>
+                  <a  onClick={()=>{
+                      router.push('/profile/')
+                    }}> sign in to add show</a>
+                </div>
+                  }
+                </div>
+                  ))}
+          </div>
+          
 
       </main>
 

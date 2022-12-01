@@ -145,9 +145,48 @@
 }
 .resultCellName{
   width:200px;
+  background-color: #222;
 
   text-align: center;
   background-color: #222;
+
+}
+.likesCell{
+  width:50px;
+  background-color: #222;
+}
+
+.addtoLibrary{
+  text-align: center;
+  font-size: 20px;
+}
+.addtoLibrary:hover,
+.addtoLibrary:focus,
+.addtoLibrary:active {
+  cursor: pointer;
+  color: #57B282;
+  border-color: #57B282;
+  background-color: #222;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+
+.showListContainer{
+  margin: 10vh;
+  width: 150vh;
+  column-gap: 10px;
+  height: 600px;
+  display: flex;
+  overflow-x: scroll;
+}
+.showButton:hover,
+.showButton:focus,
+.showButton:active {
+  cursor: pointer;
+  color: #57B282;
+  border-color: #57B282;
+  background-color: #222;
+  transition: color 0.15s ease, border-color 0.15s ease;
 
 }
 .resultCellName:hover,
@@ -160,6 +199,7 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 
 }
+
 .removeShow{
   margin-left:10px;
   width:60px;

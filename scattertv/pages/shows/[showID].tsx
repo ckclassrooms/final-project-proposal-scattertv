@@ -168,7 +168,6 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
       let docRef = await setDoc(doc(db, "users", uid), {
         shows:showsReceived.shows
       },{ merge: true });
-      console.log("Document written with ID: ", docRef);
     } catch (e) {
       console.error("Error adding document: ", e);
     }

@@ -7,11 +7,6 @@ import { useRouter } from 'next/router'
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 
-export async function getStaticProps() {
-  return {
-    props: { title: 'My Title', content: '...' }
-  }
-}
 const firebaseConfig = {
   apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
   authDomain: "scattertv-b89bc.firebaseapp.com",
@@ -27,8 +22,7 @@ const auth = getAuth(app);
 
 
 
-function Home(title: String) {
-  console.log(title)
+function Home() {
   const router = useRouter()
   let [showSearch, setShowSearch] = useState<any>([])
   let [isLoading, setLoading] = useState(false);
@@ -38,12 +32,12 @@ function Home(title: String) {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
-        console.log("signed in!")
+        console.log("Signed in to firebase!")
         setSignin(true)
         // ...
       } else {
         setSignin(false)
-        console.log("signed out")
+        console.log("Signed out from firebase!")
       }
     })
   },[])
@@ -149,8 +143,6 @@ function Home(title: String) {
               <h2>Top 100 Shows &rarr;</h2>
               <p>A list of the most popular shows from around the world.</p>
             </a>
-
-
             <a
               href="https://cs484-website.pages.dev/syllabus"
               className={styles.card}
