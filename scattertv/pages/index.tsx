@@ -143,18 +143,18 @@ function Home() {
               <h2>Top 100 Shows &rarr;</h2>
               <p>A list of the most popular shows from around the world.</p>
             </a>
+            <a className={styles.card} onClick={()=>{
+                  router.push('/showanalytics/')
+            }}>
+              <h2>Analytics &rarr;</h2>
+              <p>View stats that this website is tracking</p>
+            </a>
             <a
               href="https://cs484-website.pages.dev/syllabus"
               className={styles.card}
             >
               <h2>Project  &rarr;</h2>
               <p>This project was developed for CS484 Secure Web App Development</p>
-            </a>
-            <a className={styles.card} onClick={()=>{
-                  router.push('/showanalytics/')
-            }}>
-              <h2>Analytics &rarr;</h2>
-              <p>View stats that this website is tracking</p>
             </a>
 
           </div>

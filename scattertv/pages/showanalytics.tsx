@@ -38,6 +38,41 @@ async function getData(setUserShows){
     setUserShows(scrubbedShows)
 
 }
+async function showStats(showName,showID,posterPath,isAddingToAccount){
+  let showSnap = await getDoc(doc(db,"showStats",String(showID)))
+  let showReceived = showSnap.data();
+  if(showReceived === undefined){
+    await setDoc(doc(db, "showStats", String(showID)), {
+      showID:showID,
+      showName:showName,
+      posterPath:posterPath,
+      clickCount : 1,
+      addedCount : 0,
+    });
+  }else if(isAddingToAccount){
+    let showClickCount = showReceived.clickCount
+    let showAddedCount = showReceived.addedCount+1
+    await setDoc(doc(db, "showStats", String(showID)), {
+      showID:showID,
+      showName:showName,
+      posterPath:posterPath,
+      clickCount : showClickCount,
+      addedCount : showAddedCount,
+    });
+    return
+  }else{
+    let showClickCount = showReceived.clickCount+1
+    let showAddedCount = showReceived.addedCount
+    await setDoc(doc(db, "showStats", String(showID)), {
+      showID:showID,
+      showName:showName,
+      posterPath:posterPath,
+      clickCount : showClickCount,
+      addedCount : showAddedCount,
+    });
+    return
+  }
+}
 
 function Analytics(title: String) {
   const router = useRouter()
@@ -48,6 +83,8 @@ function Analytics(title: String) {
   let [uid,setUID] = useState('')
   async function addShow (showName,showID,posterPath)  {
     try {
+      showStats(showName,showID,posterPath,true)
+
       console.log(uid)
       let firstDoc = doc(db, "users", uid);
 
@@ -126,6 +163,9 @@ function Analytics(title: String) {
   let userShowsAddsSorted = userShowsClone.sort((a, b) => {
     return b[4]- a[4] ;
   });
+  userShowsAddsSorted = userShowsAddsSorted.filter((data)=>{
+    return data[4] !== 0
+  })
   
   return (
     <div>
@@ -210,6 +250,7 @@ function Analytics(title: String) {
                 {isSignedIn ? 
                   <div className={styles.addtoLibrary}>
                     <a  onClick={()=>{
+                        addShow(show[0],show[1],show[2])
                         router.push('/profile/')
                       }}> add to library</a>
                   </div> :
@@ -236,7 +277,7 @@ function Analytics(title: String) {
                   <br></br>
                   {show[0]}
                   <br></br>
-                  {show[4]} {show[4] === 1 ? <a>add</a> : <a>adds</a>}
+                  {show[4]} {show[4] === 1 ? <a>save</a> : <a>saves</a>}
                 </div>
                 {isSignedIn ? 
                   <div className={styles.addtoLibrary}>

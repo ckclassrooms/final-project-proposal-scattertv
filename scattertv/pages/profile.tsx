@@ -6,7 +6,7 @@ import axios from "axios";
 import { useRouter } from 'next/router'
 import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
+import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
 
 export async function getStaticProps() {
   return {
@@ -225,22 +225,6 @@ function Home(title: String) {
 
 
 
-        <div className={styles.grid}>
-
-        <a className={styles.card} onClick={()=>{
-                  router.push('/top100/')
-            }}>
-              <h2>Top 100 Shows &rarr;</h2>
-              <p>A list of the most popular shows from around the world.</p>
-            </a>
-          <a
-            href="https://cs484-website.pages.dev/syllabus"
-            className={styles.card}
-          >
-            <h2>Project  &rarr;</h2>
-            <p>This project was developed for CS484; a Secure Web App Development Course</p>
-          </a>
-        </div>
       </main>
       </div>
       <div>

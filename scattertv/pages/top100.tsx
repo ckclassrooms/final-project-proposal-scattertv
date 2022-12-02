@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
+import {getFirestore, doc, setDoc,getDoc} from "firebase/firestore"; 
 
 import { getAuth , signOut, onAuthStateChanged} from "firebase/auth";
 
@@ -25,7 +25,6 @@ const db = getFirestore(app);
 
 function TopShows(props) {
   let showList = props.topShows
-  console.log(showList)
   const router = useRouter()
   let [isSignedIn, setSignin] = useState(false);
   let [uid, setUID] = useState('')

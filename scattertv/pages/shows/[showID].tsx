@@ -7,7 +7,7 @@ import styles from '../../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc,addDoc, setDoc,getDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
+import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
 var gen = require('color-generator');
 
 const firebaseConfig = {
