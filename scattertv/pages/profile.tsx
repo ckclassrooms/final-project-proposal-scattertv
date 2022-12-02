@@ -48,8 +48,10 @@ function Home(title: String) {
         let firstDoc = await doc(db, "users", uid);
         const docSnap = await getDoc(firstDoc);
         let showsReceived = docSnap.data();
-        let addShow = true;
         let scrubbedShows = []
+        if (showsReceived === undefined){
+          return
+        }
         const result = showsReceived.shows.map((obj) => {
           scrubbedShows.push([obj.showName,obj.showID,obj.posterPath])
         })

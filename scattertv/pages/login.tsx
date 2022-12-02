@@ -1,12 +1,14 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc, setDoc } from "firebase/firestore"; 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {getFirestore, doc,addDoc, setDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider , getAdditionalUserInfo} from "firebase/auth";
+
 export async function getStaticProps() {
   return {
     props: { title: 'My Title', content: '...' }
@@ -27,26 +29,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+async function initalUserSetup(uid){
+  try {
+    let userDoc = await doc(db, 'users', uid)
+    await setDoc(userDoc, {
+          shows: [],
+        });
+      
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+
+}
 
 function firebaseSignUp(email,password): boolean{
     createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       // Signed in 
       const user = userCredential.user;
-
-      console.log("Signed in as ", user)
       // Create firebase entry for user storage
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                'email': email,
-              });
-            
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
-    
+      initalUserSetup(user.uid)
       return true
-      
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -113,10 +118,17 @@ function Home(title: String) {
     }
     return 'Show Found!'
   }
+  provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+  auth.languageCode = 'en';
+  provider.setCustomParameters({
+    'login_hint': 'user@example.com'
+  });
 
-  var showRes = showSearch
   return (
+    
     <div>
+      <script src="https://accounts.google.com/gsi/client" async defer></script>
+
       <div className={styles.container}>
         <Head>
           <title>ScatterTV</title>
@@ -144,13 +156,52 @@ function Home(title: String) {
               }} >
             Login
           </button>
-          <button className="login__btn login__google" onClick={()=> {setSignIn(firebaseSignUp(email,password))}} >
-            Sign Up
-          </button>
         </div>
         
         <a>No Account? Sign up below!</a>
-
+        
+        <div className = {styles.loginBox}>
+          
+          <input type="text" placeholder="E-mail Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)} />
+          <input type="password" placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+          />
+          <button className="login__btn login__google" onClick={()=> {setSignIn(firebaseSignUp(email,password))}} >
+            Sign Up
+          </button>
+          <button onClick={()=>{
+              signInWithPopup(auth, provider)
+              .then((result) => {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+                // The signed-in user info.
+                const user = result.user;
+                const { isNewUser } = getAdditionalUserInfo(result)
+                if(isNewUser){
+                  console.log("New User!")
+                  initalUserSetup(user.uid)
+                }
+                router.push('/')
+        
+              }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.customData.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                console.log(error,errorMessage,errorCode)
+                // ...
+              });
+            }}>
+            sign in with google
+          </button>
+        </div>
 
         </main>
 
