@@ -145,8 +145,9 @@ function Home(title: String) {
               <a className={styles.profileButton} onClick={()=>{
                     router.push('/profile')
                 }}>my profile</a>
-                <a className={styles.profileButton} onClick={()=>{      
+                <a className={styles.profileButton} onClick={()=>{
                   signOut(auth).then(() => {
+                    router.push('/')
                     // Sign-out successful.
                   }).catch((error) => {
                     // An error happened.
