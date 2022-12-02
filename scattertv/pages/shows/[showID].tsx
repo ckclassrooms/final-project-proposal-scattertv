@@ -198,7 +198,6 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
       });
       return
     }else{
-      console.log("else")
       let showClickCount = showReceived.clickCount+1
       let showAddedCount = showReceived.addedCount
       await setDoc(doc(db, "showStats", String(showID)), {

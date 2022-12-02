@@ -190,27 +190,38 @@ function Home(title: String) {
         }
         </div>
 
-        <div className="hidden lg:block">
-          <table className={styles.userShowsTable}>
-              <tbody>
-                {userShows.map(emp => (
-                  <tr className={styles.userShowRows} key={emp}>
-                    <td className={styles.resultCellImg} onClick={() => {
-                    }}><img width='150px' src={emp[2]}></img></td>
-                    <td className={styles.resultCellName} onClick={() => {
-                      setLoading(true)
-                      router.push('/shows/'+emp[1])
-                    }}><a>{emp[0]}</a></td>
-                    <td className={styles.removeShowCell} onClick={() => {
-                      removeShow(emp[1])
-                    }}><a className={styles.removeShow}>Remove</a></td>
-
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
+        <div className ={styles.topShows}>
+          <h1>
+            my shows
+          </h1>
+        <div className={styles.showListContainer}>
+            {
+            userShows.map(show => (
+              <div className={styles.individualShow} key={show}>
+                <div className={styles.showButton} onClick={()=>{
+                  router.push('/shows/'+show[1])
+                }}>
+                  <Image width={288} height={430} src={show[2]} alt={show[0]}/>
+                  <br></br>
+                  {show[0]}
+                  <br></br>
+                </div>
+                {isSignedIn ? 
+                  <div className={styles.removeShow}>
+                    <a  onClick={()=>{
+                      removeShow(show[1])
+                      }}> remove from library</a>
+                  </div> :
+                  <div className={styles.addtoLibrary}>
+                  <a  onClick={()=>{
+                      router.push('/login/')
+                    }}> sign in to add show</a>
+                </div>
+                  }
+                </div>
+                  ))}
         </div>
+      </div>
 
 
 

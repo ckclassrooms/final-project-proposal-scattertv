@@ -118,15 +118,12 @@
 
 }
 .title {
-  
   text-align: center;
   align-items: center;
   margin: auto;
   line-height: 1.0;
   font-size: 4rem;
 }
-
-
 
 .tableResults {
   display: flex;
@@ -135,22 +132,24 @@
   padding: 1rem 0;
   border: 1px solid #eaeaea;
 }
+
 .userShowsTable{
   border-spacing:0; /* Removes the cell spacing via CSS */ 
   border-collapse: collapse;
 }
+
 .resultCellImg{
   padding-left: 5px;
   background-color: #222;
 }
+
 .resultCellName{
   width:200px;
   background-color: #222;
-
   text-align: center;
   background-color: #222;
-
 }
+
 .likesCell{
   width:50px;
   background-color: #222;
@@ -160,6 +159,7 @@
   text-align: center;
   font-size: 20px;
 }
+
 .addtoLibrary:hover,
 .addtoLibrary:focus,
 .addtoLibrary:active {
@@ -169,16 +169,18 @@
   background-color: #222;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-
+.topShows{
+  margin: 10vh;
+}
 
 .showListContainer{
-  margin: 10vh;
   width: 150vh;
   column-gap: 10px;
   height: 600px;
   display: flex;
   overflow-x: scroll;
 }
+
 .showButton:hover,
 .showButton:focus,
 .showButton:active {
@@ -201,8 +203,7 @@
 }
 
 .removeShow{
-  margin-left:10px;
-  width:60px;
+  background-color: #d02f2f;
   text-align: center;
 }
 .removeShow:hover,

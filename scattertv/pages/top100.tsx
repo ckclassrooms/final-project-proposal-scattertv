@@ -176,7 +176,7 @@ function TopShows(props) {
                   <Image width={288} height={430} src={show.poster_path} alt={show.showName}/>
                   {show.name}
                   <br></br>
-                  {show.vote_count} Likes
+                  {show.vote_count} Likes on TMDB
                 </div>
                 {isSignedIn ? 
                   <div className={styles.addtoLibrary}>

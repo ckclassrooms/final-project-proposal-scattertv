@@ -185,7 +185,9 @@ function Analytics(title: String) {
         }
         </div>
         <div className ={styles.topShows}>
-        most viewed
+          <h1>
+            most viewed
+          </h1>
         <div className={styles.showListContainer}>
             {
             userShows.map(show => (
@@ -214,7 +216,9 @@ function Analytics(title: String) {
                 </div>
                   ))}
         </div>
-        most added
+        <h1>
+          most saved
+        </h1>
         <div className={styles.showListContainer}>
             {
             userShows.map(show => (
