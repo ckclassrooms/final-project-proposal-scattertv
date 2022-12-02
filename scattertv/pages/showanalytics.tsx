@@ -118,7 +118,15 @@ function Analytics(title: String) {
   }
   var showRes = showSearch
   console.log(userShows);
+  let userShowsClone = userShows.map((x) => x);
+  let userShowsViewsSorted = userShows.sort((a, b) => {
+    return b[3]- a[3] ;
+  });
 
+  let userShowsAddsSorted = userShowsClone.sort((a, b) => {
+    return b[4]- a[4] ;
+  });
+  
   return (
     <div>
       <div className={styles.container}>
@@ -164,8 +172,6 @@ function Analytics(title: String) {
           }
           }
         />
-
-
         <div className="hidden lg:block">
         {isLoading ? <p>Loading Show...</p> :
           <table>
@@ -190,7 +196,7 @@ function Analytics(title: String) {
           </h1>
         <div className={styles.showListContainer}>
             {
-            userShows.map(show => (
+            userShowsViewsSorted.map(show => (
               <div className={styles.individualShow} key={show}>
                 <div className={styles.showButton} onClick={()=>{
                   router.push('/shows/'+show[1])
@@ -221,7 +227,7 @@ function Analytics(title: String) {
         </h1>
         <div className={styles.showListContainer}>
             {
-            userShows.map(show => (
+            userShowsAddsSorted.map(show => (
               <div className={styles.individualShow} key={show}>
                 <div className={styles.showButton} onClick={()=>{
                   router.push('/shows/'+show[1])
@@ -252,23 +258,6 @@ function Analytics(title: String) {
         </div>
 
 
-
-        <div className={styles.grid}>
-
-        <a className={styles.card} onClick={()=>{
-                  router.push('/top100/')
-            }}>
-              <h2>Top 100 Shows &rarr;</h2>
-              <p>A list of the most popular shows from around the world.</p>
-            </a>
-          <a
-            href="https://cs484-website.pages.dev/syllabus"
-            className={styles.card}
-          >
-            <h2>Project  &rarr;</h2>
-            <p>This project was developed for CS484; a Secure Web App Development Course</p>
-          </a>
-        </div>
       </main>
       </div>
       <div>
