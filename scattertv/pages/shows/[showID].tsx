@@ -152,7 +152,6 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
   },[])
   async function addShow (showName,showID,posterPath)  {
     try {
-      showStats(showName,showID,posterPath,true)
       console.log(uid)
       let firstDoc = doc(db, "users", uid);
 
@@ -167,6 +166,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
       });
       if(addShow){
         showsReceived.shows.push(showToAdd)
+        showStats(showName,showID,posterPath,true)
       }
       let docRef = await setDoc(doc(db, "users", uid), {
         shows:showsReceived.shows

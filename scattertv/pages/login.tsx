@@ -1,12 +1,12 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import axios from "axios";
 import { useRouter } from 'next/router'
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc,addDoc, setDoc, collection, Firestore, initializeFirestore, updateDoc } from "firebase/firestore"; 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import {getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { GoogleAuthProvider , getAdditionalUserInfo} from "firebase/auth";
 
 export async function getStaticProps() {

@@ -83,7 +83,6 @@ function Analytics(title: String) {
   let [uid,setUID] = useState('')
   async function addShow (showName,showID,posterPath)  {
     try {
-      showStats(showName,showID,posterPath,true)
 
       console.log(uid)
       let firstDoc = doc(db, "users", uid);
@@ -99,6 +98,8 @@ function Analytics(title: String) {
       });
       if(addShow){
         showsReceived.shows.push(showToAdd)
+        showStats(showName,showID,posterPath,true)
+
       }
       let docRef = await setDoc(doc(db, "users", uid), {
         shows:showsReceived.shows

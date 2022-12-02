@@ -42,9 +42,9 @@ function Home(title: String) {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const uid = user.uid;
-        console.log("signed in!")
         setSignin(true)
         setUID(uid)
+        console.log(uid)
         let firstDoc = await doc(db, "users", uid);
         const docSnap = await getDoc(firstDoc);
         let showsReceived = docSnap.data();
@@ -64,6 +64,31 @@ function Home(title: String) {
     });
   
   },[])
+  async function showStats(showName,showID,posterPath){
+    let showSnap = await getDoc(doc(db,"showStats",String(showID)))
+    let showReceived = showSnap.data();
+    if(showReceived === undefined){
+      await setDoc(doc(db, "showStats", String(showID)), {
+        showID:showID,
+        showName:showName,
+        posterPath:posterPath,
+        clickCount : 1,
+        addedCount : 0,
+      });
+    }
+
+    let showClickCount = showReceived.clickCount
+    let showAddedCount = showReceived.addedCount-1
+      await setDoc(doc(db, "showStats", String(showID)), {
+        showID:showID,
+        showName:showName,
+        posterPath:posterPath,
+        clickCount : showClickCount,
+        addedCount : showAddedCount,
+      });
+      return
+    }
+
   async function removeShow (showID)  {
     try {
       let firstDoc = doc(db, "users", uid);
@@ -213,6 +238,7 @@ function Home(title: String) {
                   <div className={styles.removeShow}>
                     <a  onClick={()=>{
                       removeShow(show[1])
+                      showStats(show[0],show[1],show[2])
                       }}> remove from library</a>
                   </div> :
                   <div className={styles.addtoLibrary}>
