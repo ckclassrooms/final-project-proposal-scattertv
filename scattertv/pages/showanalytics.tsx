@@ -7,7 +7,6 @@ import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import {getFirestore, doc,getDocs, setDoc,getDoc, collection} from "firebase/firestore"; 
 import searchShow from '../components/searchShow';
-import showStats from '../components/showStats'
 import addShow from '../components/addShow'
 
 const firebaseConfig = {
@@ -29,7 +28,7 @@ async function getData(setUserShows){
     let scrubbedShows = []
     const querySnapshot = await getDocs(collection(db, "showStats"));
     querySnapshot.forEach((doc) => {
-      let posterPath = "https://image.tmdb.org/t/p/w500" + doc.data().posterPath
+      let posterPath =  doc.data().posterPath
       scrubbedShows.push([doc.data().showName,doc.data().showID,posterPath,doc.data().clickCount,doc.data().addedCount])
     });
     setUserShows(scrubbedShows)
@@ -152,7 +151,7 @@ function Analytics(title: String) {
                 <div className={styles.showButton} onClick={()=>{
                   router.push('/shows/'+show[1])
                 }}>
-                  <Image width={288} height={430} src={show[2]} alt={show[0]}/>
+                  <Image width={288} height={430} src={"https://image.tmdb.org/t/p/w500"+show[2]} alt={show[0]}/>
                   <br></br>
                   {show[0]}
                   <br></br>
@@ -184,7 +183,7 @@ function Analytics(title: String) {
                 <div className={styles.showButton} onClick={()=>{
                   router.push('/shows/'+show[1])
                 }}>
-                  <Image width={288} height={430} src={show[2]} alt={show[0]}/>
+                  <Image width={288} height={430} src={"https://image.tmdb.org/t/p/w500"+show[2]} alt={show[0]}/>
                   <br></br>
                   {show[0]}
                   <br></br>

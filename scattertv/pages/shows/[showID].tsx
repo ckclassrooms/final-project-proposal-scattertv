@@ -156,7 +156,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
     return <div>Loading...</div>
   }
   let showData = props.res
-  let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path
+  let posterPath = showData.poster_path
   var showRes = showSearch
 
   showStats(db,showData.name,showData.id,showData.poster_path,false)
@@ -226,7 +226,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
 
         <div className={styles.graphSite}>
             <div className={styles.posterContainer}>
-                <img width={400} src={posterPath}></img>
+                <img width={400} src={"https://image.tmdb.org/t/p/w500"+posterPath}></img>
             </div>
             <div className={styles.bioContainer}>
                 <div className={styles.bio}>

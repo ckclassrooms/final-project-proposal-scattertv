@@ -7,6 +7,7 @@ import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
 import searchShow from '../components/searchShow';
+import showStatsRemove from '../components/showStatsRemove'
 
 export async function getStaticProps() {
   return {
@@ -64,33 +65,7 @@ function Home(title: String) {
     });
   
   },[])
-  async function showStats(showName,showID,posterPath){
-    let showSnap = await getDoc(doc(db,"showStats",String(showID)))
-    let showReceived = showSnap.data();
-    if(showReceived === undefined){
-      await setDoc(doc(db, "showStats", String(showID)), {
-        showID:showID,
-        showName:showName,
-        posterPath:posterPath,
-        clickCount : 1,
-        addedCount : 0,
-      });
-    }
 
-    let showClickCount = showReceived.clickCount
-    let showAddedCount = showReceived.addedCount-1
-    if (showAddedCount < 0){
-      showAddedCount = 0
-    }
-      await setDoc(doc(db, "showStats", String(showID)), {
-        showID:showID,
-        showName:showName,
-        posterPath:posterPath,
-        clickCount : showClickCount,
-        addedCount : showAddedCount,
-      });
-      return
-    }
 
   async function removeShow (showID)  {
     try {
@@ -125,7 +100,7 @@ function Home(title: String) {
     }
   }
 
-
+  console.log(userShows)
   var showRes = showSearch
   return (
     <div>
@@ -205,7 +180,7 @@ function Home(title: String) {
                 <div className={styles.showButton} onClick={()=>{
                   router.push('/shows/'+show[1])
                 }}>
-                  <Image width={288} height={430} src={show[2]} alt={show[0]}/>
+                  <Image width={288} height={430} src={"https://image.tmdb.org/t/p/w500" + show[2]} alt={show[0]}/>
                   <br></br>
                   {show[0]}
                   <br></br>
@@ -214,7 +189,7 @@ function Home(title: String) {
                   <div className={styles.removeShow}>
                     <a  onClick={async ()=>{
                       await removeShow(show[1]).then(()=>{
-                        showStats(show[0],show[1],show[2])
+                        showStatsRemove(db,show[0],show[1],show[2])
                       })
                       }}> remove from library</a>
                   </div> :

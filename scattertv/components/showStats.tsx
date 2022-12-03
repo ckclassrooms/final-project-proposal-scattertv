@@ -17,10 +17,9 @@ async function showStats(db,showName,showID,posterPath,isAddingToAccount){
       await setDoc(doc(db, "showStats", String(showID)), {
         showID:showID,
         showName:showName,
-        posterPath:posterPath,
         clickCount : showClickCount,
         addedCount : showAddedCount,
-      });
+      },{merge:true});
       return
     }else{
       let showClickCount = showReceived.clickCount+1
@@ -28,10 +27,9 @@ async function showStats(db,showName,showID,posterPath,isAddingToAccount){
       await setDoc(doc(db, "showStats", String(showID)), {
         showID:showID,
         showName:showName,
-        posterPath:posterPath,
         clickCount : showClickCount,
         addedCount : showAddedCount,
-      });
+      },{merge:true});
       return
     }
   }
