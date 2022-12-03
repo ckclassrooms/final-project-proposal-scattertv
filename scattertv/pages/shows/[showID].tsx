@@ -4,29 +4,14 @@ import Image from 'next/image'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-import {getFirestore} from "firebase/firestore"; 
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import searchShow from '../../components/searchShow'
 import showStats from '../../components/showStats'
 import addShow from '../../components/addShow'
-
+import { auth,db } from '../../components/firebaseConfig'
 var gen = require('color-generator');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
-  authDomain: "scattertv-b89bc.firebaseapp.com",
-  projectId: "scattertv-b89bc",
-  storageBucket: "scattertv-b89bc.appspot.com",
-  messagingSenderId: "323125299537",
-  appId: "1:323125299537:web:f2001ab206765c49546b70",
-  measurementId: "G-656M6GP9TL"
-};
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 import {
   Chart as ChartJS,

@@ -3,25 +3,11 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { initializeApp } from 'firebase/app';
-import {getFirestore} from "firebase/firestore"; 
-
-import { getAuth , signOut, onAuthStateChanged} from "firebase/auth";
+import {signOut, onAuthStateChanged} from "firebase/auth";
 import searchShow from '../components/searchShow';
 import addShow from '../components/addShow'
-const firebaseConfig = {
-  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
-  authDomain: "scattertv-b89bc.firebaseapp.com",
-  projectId: "scattertv-b89bc",
-  storageBucket: "scattertv-b89bc.appspot.com",
-  messagingSenderId: "323125299537",
-  appId: "1:323125299537:web:f2001ab206765c49546b70",
-  measurementId: "G-656M6GP9TL"
-};
+import { auth, db } from '../components/firebaseConfig'
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 function TopShows(props) {
   let showList = props.topShows

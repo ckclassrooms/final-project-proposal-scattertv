@@ -3,30 +3,16 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
+import { onAuthStateChanged , signOut} from "firebase/auth";
+import { doc, setDoc,getDoc } from "firebase/firestore"; 
 import searchShow from '../components/searchShow';
 import showStatsRemove from '../components/showStatsRemove'
-
+import { db,auth } from '../components/firebaseConfig'
 export async function getStaticProps() {
   return {
     props: { title: 'My Title', content: '...' }
   }
 }
-const firebaseConfig = {
-  apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
-  authDomain: "scattertv-b89bc.firebaseapp.com",
-  projectId: "scattertv-b89bc",
-  storageBucket: "scattertv-b89bc.appspot.com",
-  messagingSenderId: "323125299537",
-  appId: "1:323125299537:web:f2001ab206765c49546b70",
-  measurementId: "G-656M6GP9TL"
-};
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 
 
