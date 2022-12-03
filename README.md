@@ -1,36 +1,45 @@
-ScatterTV 2.0
+<h2>ScatterTV 2.0</h2>
+
 Deployed Site
 
 https://www.scattertv.com/
-Deployment Instructions
 
-    Sign up for an account at themoviedb
+<h2>Deployment Instructions</h2>
 
-    Under account settings there will be an option to generate an API key
+- Sign up for an account at themoviedb
 
-    Add a .env file to the root folder of the repository.
+- Under account settings there will be an option to generate an API key
 
-    Create a new key value pair in the following format
-        NEXT_PUBLIC_TMDB=APIKEYHERE
+- Add a .env file to the root folder of the repository.
 
-    npm run build to create a build file
+- Create a new key value pair in the following format
+    `NEXT_PUBLIC_TMDB=APIKEYHERE`
 
-    or npm start to run the application in a dev enviorment
+- `npm run build` to create a build file
 
-Current Build
-    Graph show ratings using TMDB API and ChartJS
-    Supports Google SSO login with OAuth
-    Custom user profiles where users can add their own shows and track them
-    Analytical data which shows how many users viewed the show on ScatterTV and how many have added the show to their account
+- or `npm start dev` to run the application in a dev enviorment
 
-Tech Used
-    NextJS/ReactJS for Incremental Static Generation of individual show paths, loading of the top 100 path as a static page on initial build, and Components
-    Firebase for storing graph analytical data, user profiles, and shows that users have added to their account
-    Netlify for hosting/deployment
+<h2>Current Build</h2>
+
+- Graph show ratings using TMDB API and ChartJS
+
+- Supports Google SSO login with OAuth
+
+- Custom user profiles where users can add their own shows and track them
+
+- Analytical data which shows how many users viewed the show on ScatterTV and how many have added the show to their account
+
+<h2>Tech Used</h2>
+
+- NextJS/ReactJS for Incremental Static Generation of individual show paths, loading of the top 100 path as a static page on initial build, and Components
+
+- Firebase for storing graph analytical data, user profiles, and shows that users have added to their account
+
+- Netlify for hosting/deployment
     
 
 
-Overview
+<h2>Overview</h2>
 
 So a while back, I worked on a web application using Python and Flask called ScatterTV. It was a very simple web application that used a csv file provided by IMDb that contained tv show rating information to then plot on a graph. However since then, I have discovered an API called themoviedb. This site is basically like IMDb, but has a public API that anybody can use to query show information from. Additionally, now that I have learned a bit about security and creating a secure web application, I can see that my original project had a TON of areas where malicious SQL injections were possible.
 What I want the application to support
