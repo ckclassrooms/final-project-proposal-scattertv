@@ -1,5 +1,4 @@
 import {useRouter} from 'next/router'
-import axios from 'axios'
 import Image from 'next/image'
 
 import Head from 'next/head'
@@ -7,7 +6,11 @@ import styles from '../../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
-import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
+import {getFirestore} from "firebase/firestore"; 
+import searchShow from '../../components/searchShow'
+import showStats from '../../components/showStats'
+import addShow from '../../components/addShow'
+
 var gen = require('color-generator');
 
 const firebaseConfig = {
@@ -38,7 +41,6 @@ import {
 
 import {Line} from "react-chartjs-2"
 import { cc, ad } from 'chart.js/dist/chunks/helpers.core'
-import { async } from '@firebase/util'
 ChartJS.register(
   {
     id: 'graphCursor',
@@ -149,108 +151,16 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
         console.log("signed out")
       }
     })
-  },[])
-  async function addShow (showName,showID,posterPath)  {
-    try {
-      console.log(uid)
-      let firstDoc = doc(db, "users", uid);
-
-      const docSnap = await getDoc(firstDoc);
-      let showsReceived = docSnap.data();
-      let showToAdd = {showID:showID,posterPath:posterPath,showName:showName};
-      let addShow = true;
-      const result = showsReceived.shows.map((obj) => {
-        if(obj.showName === showName){
-          addShow = false;
-        }
-      });
-      if(addShow){
-        showsReceived.shows.push(showToAdd)
-        showStats(showName,showID,posterPath,true)
-      }
-      let docRef = await setDoc(doc(db, "users", uid), {
-        shows:showsReceived.shows
-      },{ merge: true });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
-  async function showStats(showName,showID,posterPath,isAddingToAccount){
-    let showSnap = await getDoc(doc(db,"showStats",String(showID)))
-    let showReceived = showSnap.data();
-    if(showReceived === undefined){
-      await setDoc(doc(db, "showStats", String(showID)), {
-        showID:showID,
-        showName:showName,
-        posterPath:posterPath,
-        clickCount : 1,
-        addedCount : 0,
-      });
-    }else if(isAddingToAccount){
-      let showClickCount = showReceived.clickCount
-      let showAddedCount = showReceived.addedCount+1
-      await setDoc(doc(db, "showStats", String(showID)), {
-        showID:showID,
-        showName:showName,
-        posterPath:posterPath,
-        clickCount : showClickCount,
-        addedCount : showAddedCount,
-      });
-      return
-    }else{
-      let showClickCount = showReceived.clickCount+1
-      let showAddedCount = showReceived.addedCount
-      await setDoc(doc(db, "showStats", String(showID)), {
-        showID:showID,
-        showName:showName,
-        posterPath:posterPath,
-        clickCount : showClickCount,
-        addedCount : showAddedCount,
-      });
-      return
-    }
-  }
-  
-
+  },[])  
   if (router.isFallback){
     return <div>Loading...</div>
   }
-
-
-
   let showData = props.res
-  showStats(showData.name,showData.id,showData.poster_path,false)
-
   let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path
-  // Query TMDB to get search results of a search string
-  const searchShow = async (search: string) => {
-    if (search.length === 0) {
-      setShowSearch([])
-    }
-    if (search.length >= 2) {
-      await axios("https://api.themoviedb.org/3/search/tv?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page=1&query=" + search + "&include_adult=false").then(
-        (res) => {
-          const json = res.data;
-          let totalResults = 0
-          let searchResults = []
-          for (let i = 0; i < json.results.length; ++i) {
-            if (totalResults === 3) {
-              break
-            }
-            let showName = json.results[i]['name'];
-            let showID = json.results[i]['id']
-            let posterPath = "https://image.tmdb.org/t/p/w500" + json.results[i]['poster_path']
-            searchResults.push([showName, showID, posterPath])
-            totalResults += 1
-          }
-          setShowSearch(searchResults || [])
-        }
-      )
-
-    }
-    return 'Show Found!'
-  }
   var showRes = showSearch
+
+  showStats(db,showData.name,showData.id,showData.poster_path,false)
+  
   return (
     <div>
       <div className={styles.containerShowPage}>
@@ -292,7 +202,7 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
             type="text"
             // className="md:w-1/2"
             onChange={(e) => {
-              searchShow(e.target.value)
+              searchShow (setShowSearch,e.target.value)
             }
             }
           />
@@ -331,8 +241,9 @@ function ShowGraph(props: { res: any; data: cc<"line", (number | ad)[], unknown>
                     let showID = props['showID'];
                     let posterPath = "https://image.tmdb.org/t/p/w500" + showData.poster_path        
                     let showName = showData.name
-                    addShow(showName,showID,posterPath)
-                    showStats(showData.name,showData.id,showData.poster_path,true)
+
+                    addShow(db,uid,showName,showID,posterPath)
+                    showStats(db,showData.name,showData.id,showData.poster_path,true)
                     router.push('/profile')
     
                   }}>add to library</a> : <a>sign in to add this show to your library!</a>
@@ -409,7 +320,6 @@ export async function getStaticProps(context: { params: any }) {
     }
     graphData.datasets.push(seasonGraphData)
   }
-  console.log(graphData)
   return{
     props:{
       showID: params.showID,

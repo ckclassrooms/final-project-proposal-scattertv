@@ -2,12 +2,13 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
-import axios from "axios";
 import { useRouter } from 'next/router'
 import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import {getFirestore, doc,getDocs, setDoc,getDoc, collection} from "firebase/firestore"; 
-
+import searchShow from '../components/searchShow';
+import showStats from '../components/showStats'
+import addShow from '../components/addShow'
 
 const firebaseConfig = {
   apiKey: "AIzaSyCUccw8OTBookt1n9dN2zDu0Q_jNAEvIec",
@@ -26,53 +27,15 @@ const db = getFirestore(app);
 
 async function getData(setUserShows){
     let scrubbedShows = []
-
     const querySnapshot = await getDocs(collection(db, "showStats"));
     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.data().showName)
-      console.log(doc.data().showID)
       let posterPath = "https://image.tmdb.org/t/p/w500" + doc.data().posterPath
       scrubbedShows.push([doc.data().showName,doc.data().showID,posterPath,doc.data().clickCount,doc.data().addedCount])
     });
     setUserShows(scrubbedShows)
 
 }
-async function showStats(showName,showID,posterPath,isAddingToAccount){
-  let showSnap = await getDoc(doc(db,"showStats",String(showID)))
-  let showReceived = showSnap.data();
-  if(showReceived === undefined){
-    await setDoc(doc(db, "showStats", String(showID)), {
-      showID:showID,
-      showName:showName,
-      posterPath:posterPath,
-      clickCount : 1,
-      addedCount : 0,
-    });
-  }else if(isAddingToAccount){
-    let showClickCount = showReceived.clickCount
-    let showAddedCount = showReceived.addedCount+1
-    await setDoc(doc(db, "showStats", String(showID)), {
-      showID:showID,
-      showName:showName,
-      posterPath:posterPath,
-      clickCount : showClickCount,
-      addedCount : showAddedCount,
-    });
-    return
-  }else{
-    let showClickCount = showReceived.clickCount+1
-    let showAddedCount = showReceived.addedCount
-    await setDoc(doc(db, "showStats", String(showID)), {
-      showID:showID,
-      showName:showName,
-      posterPath:posterPath,
-      clickCount : showClickCount,
-      addedCount : showAddedCount,
-    });
-    return
-  }
-}
+
 
 function Analytics(title: String) {
   const router = useRouter()
@@ -81,33 +44,7 @@ function Analytics(title: String) {
   let [isLoading, setLoading] = useState(false);
   let [isSignedIn, setSignin] = useState(false);
   let [uid,setUID] = useState('')
-  async function addShow (showName,showID,posterPath)  {
-    try {
 
-      console.log(uid)
-      let firstDoc = doc(db, "users", uid);
-
-      const docSnap = await getDoc(firstDoc);
-      let showsReceived = docSnap.data();
-      let showToAdd = {showID:showID,posterPath:posterPath,showName:showName};
-      let addShow = true;
-      const result = showsReceived.shows.map((obj) => {
-        if(obj.showName === showName){
-          addShow = false;
-        }
-      });
-      if(addShow){
-        showsReceived.shows.push(showToAdd)
-        showStats(showName,showID,posterPath,true)
-
-      }
-      let docRef = await setDoc(doc(db, "users", uid), {
-        shows:showsReceived.shows
-      },{ merge: true });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
   // Check if user is signed in with firebase
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
@@ -127,33 +64,6 @@ function Analytics(title: String) {
   },[])
 
 
-  const searchShow = async (search: string) => {
-    if (search.length === 0) {
-      setShowSearch([])
-    }
-    if (search.length >= 2) {
-      await axios("https://api.themoviedb.org/3/search/tv?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page=1&query=" + search + "&include_adult=false").then(
-        (res) => {
-          const json = res.data;
-          let totalResults = 0
-          let searchResults = []
-          for (let i = 0; i < json.results.length; ++i) {
-            if (totalResults === 5) {
-              break
-            }
-            let showName = json.results[i]['name'];
-            let showID = json.results[i]['id']
-            let posterPath = "https://image.tmdb.org/t/p/w500" + json.results[i]['poster_path']
-            searchResults.push([showName, showID, posterPath])
-            totalResults += 1
-          }
-          setShowSearch(searchResults || [])
-        }
-      )
-
-    }
-    return 'Show Found!'
-  }
   var showRes = showSearch
   console.log(userShows);
   let userShowsClone = userShows.map((x) => x);
@@ -209,7 +119,7 @@ function Analytics(title: String) {
           placeholder="Search..."
           type="text"
           onChange={(e) => {
-            searchShow(e.target.value)
+            searchShow(setShowSearch,e.target.value)
           }
           }
         />
@@ -251,7 +161,7 @@ function Analytics(title: String) {
                 {isSignedIn ? 
                   <div className={styles.addtoLibrary}>
                     <a  onClick={()=>{
-                        addShow(show[0],show[1],show[2])
+                        addShow(db,uid,show[0],show[1],show[2])
                         router.push('/profile/')
                       }}> add to library</a>
                   </div> :
@@ -283,7 +193,7 @@ function Analytics(title: String) {
                 {isSignedIn ? 
                   <div className={styles.addtoLibrary}>
                     <a  onClick={()=>{
-                        addShow(show[0],show[1],show[2])
+                        addShow(db,uid,show[0],show[1],show[2])
                         router.push('/profile/')
                       }}> add to library</a>
                   </div> :

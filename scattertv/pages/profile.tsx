@@ -2,11 +2,11 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
-import axios from "axios";
 import { useRouter } from 'next/router'
 import { getAuth, onAuthStateChanged , signOut} from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import {getFirestore, doc, setDoc,getDoc } from "firebase/firestore"; 
+import searchShow from '../components/searchShow';
 
 export async function getStaticProps() {
   return {
@@ -79,6 +79,9 @@ function Home(title: String) {
 
     let showClickCount = showReceived.clickCount
     let showAddedCount = showReceived.addedCount-1
+    if (showAddedCount < 0){
+      showAddedCount = 0
+    }
       await setDoc(doc(db, "showStats", String(showID)), {
         showID:showID,
         showName:showName,
@@ -95,12 +98,12 @@ function Home(title: String) {
       const docSnap = await getDoc(firstDoc);
       let showsReceived = docSnap.data();
       let newListOfShows = []
-      const result = showsReceived.shows.map((obj) => {
+      showsReceived.shows.map((obj) => {
         if(obj.showID !== showID){
           newListOfShows.push(obj)
         }
       });
-      let docRef = await setDoc(doc(db, "users", uid), {
+      await setDoc(doc(db, "users", uid), {
         shows:newListOfShows
       });
       
@@ -112,7 +115,6 @@ function Home(title: String) {
       let firstDoc = doc(db, "users", uid);
       const docSnap = await getDoc(firstDoc);
       let showsReceived = docSnap.data();
-      let addShow = true;
       let scrubbedShows = []
       const result = showsReceived.shows.map((obj) => {
         scrubbedShows.push([obj.showName,obj.showID,obj.posterPath])
@@ -123,33 +125,7 @@ function Home(title: String) {
     }
   }
 
-  const searchShow = async (search: string) => {
-    if (search.length === 0) {
-      setShowSearch([])
-    }
-    if (search.length >= 2) {
-      await axios("https://api.themoviedb.org/3/search/tv?api_key=" + process.env.NEXT_PUBLIC_TMDB + "&language=en-US&page=1&query=" + search + "&include_adult=false").then(
-        (res) => {
-          const json = res.data;
-          let totalResults = 0
-          let searchResults = []
-          for (let i = 0; i < json.results.length; ++i) {
-            if (totalResults === 5) {
-              break
-            }
-            let showName = json.results[i]['name'];
-            let showID = json.results[i]['id']
-            let posterPath = "https://image.tmdb.org/t/p/w500" + json.results[i]['poster_path']
-            searchResults.push([showName, showID, posterPath])
-            totalResults += 1
-          }
-          setShowSearch(searchResults || [])
-        }
-      )
 
-    }
-    return 'Show Found!'
-  }
   var showRes = showSearch
   return (
     <div>
@@ -193,7 +169,7 @@ function Home(title: String) {
           placeholder="Search..."
           type="text"
           onChange={(e) => {
-            searchShow(e.target.value)
+            searchShow(setShowSearch,e.target.value)
           }
           }
         />
@@ -236,9 +212,10 @@ function Home(title: String) {
                 </div>
                 {isSignedIn ? 
                   <div className={styles.removeShow}>
-                    <a  onClick={()=>{
-                      removeShow(show[1])
-                      showStats(show[0],show[1],show[2])
+                    <a  onClick={async ()=>{
+                      await removeShow(show[1]).then(()=>{
+                        showStats(show[0],show[1],show[2])
+                      })
                       }}> remove from library</a>
                   </div> :
                   <div className={styles.addtoLibrary}>
