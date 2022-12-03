@@ -1,7 +1,7 @@
 ScatterTV 2.0
 Deployed Site
 
-https://scattertv.netlify.app/
+https://www.scattertv.com/
 Deployment Instructions
 
     Sign up for an account at themoviedb
@@ -11,15 +11,24 @@ Deployment Instructions
     Add a .env file to the root folder of the repository.
 
     Create a new key value pair in the following format
-        REACT_APP_TMDBKEY=APIKEYHERE
+        NEXT_PUBLIC_TMDB=APIKEYHERE
 
     npm run build to create a build file
 
     or npm start to run the application in a dev enviorment
 
-Current Issues with MVP
+Current Build
+    Graph show ratings using TMDB API and ChartJS
+    Supports Google SSO login with OAuth
+    Custom user profiles where users can add their own shows and track them
+    Analytical data which shows how many users viewed the show on ScatterTV and how many have added the show to their account
 
-    Sometimes the show information will not appear correctly on the graph. In order to circumvent this, search for the same show again to update the data properly
+Tech Used
+    NextJS/ReactJS for Incremental Static Generation of individual show paths, loading of the top 100 path as a static page on initial build, and Components
+    Firebase for storing graph analytical data, user profiles, and shows that users have added to their account
+    Netlify for hosting/deployment
+    
+
 
 Overview
 
